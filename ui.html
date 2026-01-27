@@ -16,12 +16,16 @@
       background: #ffffff;
       color: #333;
       padding: 16px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .container {
       display: flex;
       flex-direction: column;
       gap: 16px;
+      flex: 1;
     }
 
     h2 {
@@ -125,7 +129,7 @@
     }
 
     .history-list {
-      max-height: 240px;
+      max-height: 316px;
       overflow-y: auto;
       border-radius: 8px;
       background: #f0f0f0;
@@ -142,6 +146,10 @@
       justify-content: space-between;
       gap: 8px;
       position: relative;
+    }
+
+    .history-item.hidden {
+      display: none;
     }
 
     .history-item:last-child {
@@ -228,10 +236,10 @@
 
     .version-footer {
       text-align: center;
-      color: #999;
-      font-size: 10px;
+      color: #aaa;
       padding-top: 16px;
-      margin-top: auto;
+      padding-bottom: 8px;
+      font-size: 11px;
     }
   </style>
 </head>
@@ -262,10 +270,10 @@
         <div class="history-empty">No history</div>
       </div>
     </div>
+  </div>
 
-    <div class="version-footer">
-      Version 25 December 2025
-    </div>
+  <div class="version-footer">
+    Version 27 January 2025
   </div>
 
   <script>
@@ -278,6 +286,7 @@
 
     let isLoading = false;
     let selectedSize = '32';
+    let fullHistory = []; // Store complete history for filtering
 
     // Get selected size
     function getSelectedSize() {
@@ -363,6 +372,48 @@
       }
     });
 
+    // Filter history as user types
+    domainInput.addEventListener('input', (e) => {
+      filterHistory(e.target.value.trim().toLowerCase());
+    });
+
+    // Filter history based on search term
+    function filterHistory(searchTerm) {
+      const items = historyList.querySelectorAll('.history-item');
+      let hasVisibleItems = false;
+
+      items.forEach(item => {
+        const domain = item.getAttribute('data-domain').toLowerCase();
+        const matches = !searchTerm || domain.includes(searchTerm);
+        
+        if (matches) {
+          item.classList.remove('hidden');
+          hasVisibleItems = true;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      // Show "No matches" message if search term exists but no matches
+      if (searchTerm && !hasVisibleItems && fullHistory.length > 0) {
+        const emptyMsg = historyList.querySelector('.history-empty');
+        if (emptyMsg) {
+          emptyMsg.textContent = 'No matching domains';
+          emptyMsg.style.display = 'block';
+        } else {
+          const noMatchDiv = document.createElement('div');
+          noMatchDiv.className = 'history-empty';
+          noMatchDiv.textContent = 'No matching domains';
+          historyList.appendChild(noMatchDiv);
+        }
+      } else {
+        const emptyMsg = historyList.querySelector('.history-empty');
+        if (emptyMsg && fullHistory.length > 0) {
+          emptyMsg.style.display = 'none';
+        }
+      }
+    }
+
     // Delete domain from history
     function deleteDomain(domain) {
       parent.postMessage({ 
@@ -375,12 +426,14 @@
 
     // Display history
     function displayHistory(history) {
-      if (!history || history.length === 0) {
+      fullHistory = history || []; // Store full history
+      
+      if (!fullHistory || fullHistory.length === 0) {
         historyList.innerHTML = '<div class="history-empty">No history</div>';
         return;
       }
 
-      historyList.innerHTML = history.map(domain => 
+      historyList.innerHTML = fullHistory.map(domain => 
         `<div class="history-item" data-domain="${domain}">
           <span class="history-item-domain">${domain}</span>
           <button class="delete-btn" data-domain="${domain}">×</button>
@@ -410,6 +463,12 @@
           deleteDomain(domain);
         });
       });
+
+      // Apply current filter if input has text
+      const currentSearch = domainInput.value.trim().toLowerCase();
+      if (currentSearch) {
+        filterHistory(currentSearch);
+      }
     }
 
     // Handle messages from plugin
@@ -422,6 +481,8 @@
         loadBtn.textContent = 'Load Favicon';
         // No success message - silent success
         domainInput.value = '';
+        // Reset filter to show all history items
+        filterHistory('');
       } else if (msg.type === 'error') {
         isLoading = false;
         loadBtn.disabled = false;
