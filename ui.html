@@ -1,110 +1,444 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
+  <title>Favicon Loader</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: 'Inter', sans-serif;
-      margin: 20px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-size: 11px;
+      background: #ffffff;
+      color: #333;
+      padding: 16px;
     }
-    
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
     h2 {
-      margin-top: 0;
-      margin-bottom: 16px;
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 600;
+      margin-bottom: 4px;
+      color: #000;
     }
-    
+
     .input-group {
-      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    
+
+    .actions-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
     label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #333;
     }
-    
-    input {
+
+    input[type="text"] {
       width: 100%;
       padding: 8px;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      font-size: 14px;
-      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 11px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
     }
-    
-    button {
-      background-color: #18A0FB;
+
+    input[type="text"]:focus {
+      border-color: #18A0FB;
+    }
+
+    input[type="text"]::placeholder {
+      color: #999;
+    }
+
+    .button {
+      flex: 1;
+      padding: 8px 16px;
+      background: #18A0FB;
       color: white;
       border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: inherit;
       cursor: pointer;
-      width: 100%;
+      transition: background 0.2s;
     }
-    
-    button:hover {
-      background-color: #0D8DE3;
+
+    .button:hover {
+      background: #1591E8;
     }
-    
-    .error {
-      color: #EB5757;
-      font-size: 12px;
-      margin-top: 8px;
+
+    .button:active {
+      background: #0D7AC7;
+    }
+
+    .button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .message {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
       display: none;
     }
-    
-    .loading {
-      display: none;
-      margin-top: 10px;
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: #E8F5E9;
+      color: #2E7D32;
+      border: 1px solid #A5D6A7;
+    }
+
+    .message.error {
+      background: #FFEBEE;
+      color: #C62828;
+      border: 1px solid #EF9A9A;
+    }
+
+    .history-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-list {
+      max-height: 240px;
+      overflow-y: auto;
+      border-radius: 8px;
+      background: #f0f0f0;
+    }
+
+    .history-item {
+      padding: 0px 0px 0px 12px;
+      cursor: pointer;
+      font-size: 11px;
+      border-bottom: 1px solid #fff;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      position: relative;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-item:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .history-item:active {
+      background: #e8e8e8;
+    }
+
+    .history-item-domain {
+      flex: 1;
+    }
+
+    .delete-btn {
+      opacity: 0;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      transition: opacity 0.2s, color 0.2s;
+      font-size: 20px;
+      line-height: 1;
+      border-radius: 8px 0px 0px 8px;
+      font-weight: 400;
+    }
+
+    .history-item:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .delete-btn:hover {
+      color: #000;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .history-empty {
+      padding: 16px;
       text-align: center;
-      font-size: 12px;
-      color: #666;
+      color: #999;
+      font-size: 11px;
+    }
+
+    .size-selector {
+      display: inline-flex;
+      background: #f0f0f0;
+      border-radius: 8px;
+      padding: 2px;
+      gap: 0;
+    }
+
+    .size-option {
+      padding: 6px 16px;
+      cursor: pointer;
+      font-size: 11px;
+      color: #333;
+      border-radius: 6px;
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-weight: 500;
+    }
+
+    .size-option.active {
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      color: #000;
+    }
+
+    .size-option:hover:not(.active) {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .version-footer {
+      text-align: center;
+      color: #999;
+      font-size: 10px;
+      padding-top: 16px;
+      margin-top: auto;
     }
   </style>
 </head>
 <body>
-  <h2>Favicon Grabber</h2>
-  
-  <div class="input-group">
-    <label for="domain">Enter domain (e.g. shopname.com)</label>
-    <input id="domain" type="text" placeholder="shopname.com" />
-    <div id="error-message" class="error">Please enter a valid domain</div>
+  <div class="container">
+    <div class="input-group">
+      <label for="domain">Enter domain</label>
+      <input 
+        type="text" 
+        id="domain" 
+        placeholder="example.com"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="actions-row">
+      <div class="size-selector">
+        <button class="size-option active" data-size="32" id="size32">32</button>
+        <button class="size-option" data-size="120" id="size120">120</button>
+      </div>
+      <button class="button" id="loadBtn">Load Favicon</button>
+    </div>
+    
+    <div class="message" id="message"></div>
+
+    <div class="history-section">
+      <div class="history-list" id="historyList">
+        <div class="history-empty">No history</div>
+      </div>
+    </div>
+
+    <div class="version-footer">
+      Version 25 December 2025
+    </div>
   </div>
-  
-  <button id="grab-btn">Grab Favicon</button>
-  <div id="loading" class="loading">Downloading favicon...</div>
-  
+
   <script>
-    document.getElementById('grab-btn').onclick = () => {
-      const domain = document.getElementById('domain').value.trim();
-      const errorElement = document.getElementById('error-message');
+    const domainInput = document.getElementById('domain');
+    const loadBtn = document.getElementById('loadBtn');
+    const message = document.getElementById('message');
+    const historyList = document.getElementById('historyList');
+    const size32Btn = document.getElementById('size32');
+    const size120Btn = document.getElementById('size120');
+
+    let isLoading = false;
+    let selectedSize = '32';
+
+    // Get selected size
+    function getSelectedSize() {
+      return selectedSize;
+    }
+
+    // Set selected size
+    function setSelectedSize(size) {
+      selectedSize = size;
+      size32Btn.classList.toggle('active', size === '32');
+      size120Btn.classList.toggle('active', size === '120');
+    }
+
+    // Save size preference
+    function saveSize(size) {
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'save-size', 
+          size: size 
+        } 
+      }, '*');
+    }
+
+    // Handle size change
+    size32Btn.addEventListener('click', () => {
+      setSelectedSize('32');
+      saveSize('32');
+    });
+
+    size120Btn.addEventListener('click', () => {
+      setSelectedSize('120');
+      saveSize('120');
+    });
+
+    // Show message (errors only)
+    function showMessage(text, type) {
+      if (type === 'error') {
+        message.textContent = text;
+        message.className = `message show ${type}`;
+        
+        setTimeout(() => {
+          message.className = 'message';
+        }, 3000);
+      }
+    }
+
+    // Load favicon
+    function loadFavicon(domain) {
+      if (isLoading) return;
       
       if (!domain) {
-        errorElement.style.display = 'block';
+        domain = domainInput.value.trim();
+      }
+      
+      if (!domain) {
+        showMessage('Please enter a domain', 'error');
         return;
       }
+
+      const size = getSelectedSize();
+
+      isLoading = true;
+      loadBtn.disabled = true;
+      loadBtn.textContent = 'Loading...';
+      message.className = 'message';
+
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'load-favicon', 
+          domain: domain,
+          size: size
+        } 
+      }, '*');
+    }
+
+    // Button handler
+    loadBtn.addEventListener('click', () => loadFavicon());
+
+    // Enter key handler in input field
+    domainInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        loadFavicon();
+      }
+    });
+
+    // Delete domain from history
+    function deleteDomain(domain) {
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'delete-domain', 
+          domain: domain 
+        } 
+      }, '*');
+    }
+
+    // Display history
+    function displayHistory(history) {
+      if (!history || history.length === 0) {
+        historyList.innerHTML = '<div class="history-empty">No history</div>';
+        return;
+      }
+
+      historyList.innerHTML = history.map(domain => 
+        `<div class="history-item" data-domain="${domain}">
+          <span class="history-item-domain">${domain}</span>
+          <button class="delete-btn" data-domain="${domain}">×</button>
+        </div>`
+      ).join('');
+
+      // Add click handlers - directly load favicon
+      historyList.querySelectorAll('.history-item').forEach(item => {
+        const domainSpan = item.querySelector('.history-item-domain');
+        const deleteBtn = item.querySelector('.delete-btn');
+        const domain = item.getAttribute('data-domain');
+
+        domainSpan.addEventListener('click', (e) => {
+          e.stopPropagation();
+          loadFavicon(domain);
+        });
+
+        item.addEventListener('click', (e) => {
+          // Only load if not clicking delete button
+          if (!e.target.classList.contains('delete-btn')) {
+            loadFavicon(domain);
+          }
+        });
+
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteDomain(domain);
+        });
+      });
+    }
+
+    // Handle messages from plugin
+    window.onmessage = async (event) => {
+      const msg = event.data.pluginMessage;
       
-      errorElement.style.display = 'none';
-      document.getElementById('loading').style.display = 'block';
-      
-      // Send domain to the plugin code
-      parent.postMessage({ pluginMessage: { type: 'grab-favicon', domain } }, '*');
-    };
-    
-    // Listen for messages from the plugin code
-    window.onmessage = (event) => {
-      const message = event.data.pluginMessage;
-      
-      if (message.type === 'error') {
-        document.getElementById('error-message').textContent = message.message;
-        document.getElementById('error-message').style.display = 'block';
-        document.getElementById('loading').style.display = 'none';
-      } else if (message.type === 'success') {
-        document.getElementById('loading').style.display = 'none';
+      if (msg.type === 'favicon-loaded') {
+        isLoading = false;
+        loadBtn.disabled = false;
+        loadBtn.textContent = 'Load Favicon';
+        // No success message - silent success
+        domainInput.value = '';
+      } else if (msg.type === 'error') {
+        isLoading = false;
+        loadBtn.disabled = false;
+        loadBtn.textContent = 'Load Favicon';
+        showMessage(msg.message || 'Error occurred', 'error');
+      } else if (msg.type === 'history-loaded') {
+        displayHistory(msg.history);
+      } else if (msg.type === 'size-loaded') {
+        // Set segmented control based on saved size
+        setSelectedSize(msg.size);
       }
     };
+
+    // Request history on load
+    parent.postMessage({ 
+      pluginMessage: { type: 'get-history' } 
+    }, '*');
   </script>
 </body>
 </html>

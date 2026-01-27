@@ -1,10 +1,24 @@
 {
-    "name": "Favicon Grabber",
-    "id": "favicon-grabber",
-    "api": "1.0.0",
-    "main": "code.js",
-    "ui": "ui.html",
-    "editorType": ["figma"],
-    "permissions": ["currentuser"]
+  "name": "Favicon Loader",
+  "id": "1586039043468225339",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "relaunchButtons": [
+    {
+      "command": "load-favicon",
+      "name": "Load Favicon"
+    }
+  ],
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figma"
+  ],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://favicon.yandex.net"
+    ]
   }
-  
+}
