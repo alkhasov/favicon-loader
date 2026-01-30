@@ -4,502 +4,841 @@
   <meta charset="utf-8">
   <title>Favicon Loader</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      font-size: 11px;
-      background: #ffffff;
-      color: #333;
-      padding: 16px;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 11px;
+  background: #ffffff;
+  color: #333;
+  padding: 16px;
+  padding-bottom: 40px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
 
-    .container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      flex: 1;
-    }
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
 
-    h2 {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: #000;
-    }
+h2 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #000;
+}
 
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    .actions-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+.actions-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 
-    label {
-      font-size: 11px;
-      font-weight: 500;
-      color: #333;
-    }
+label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #333;
+}
 
-    input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 11px;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 11px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
 
-    input[type="text"]:focus {
-      border-color: #18A0FB;
-    }
+input[type="text"]:focus {
+  border-color: #18A0FB;
+}
 
-    input[type="text"]::placeholder {
-      color: #999;
-    }
+input[type="text"]::placeholder {
+  color: #999;
+}
 
-    .button {
-      flex: 1;
-      padding: 8px 16px;
-      background: #18A0FB;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+.button {
+  flex: 1;
+  padding: 8px 16px;
+  background: #18A0FB;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
 
-    .button:hover {
-      background: #1591E8;
-    }
+.button:hover {
+  background: #1591E8;
+}
 
-    .button:active {
-      background: #0D7AC7;
-    }
+.button:active {
+  background: #0D7AC7;
+}
 
-    .button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
+.button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
 
-    .message {
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      display: none;
-    }
+.message {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  display: none;
+}
 
-    .message.show {
-      display: block;
-    }
+.message.show {
+  display: block;
+}
 
-    .message.success {
-      background: #E8F5E9;
-      color: #2E7D32;
-      border: 1px solid #A5D6A7;
-    }
+.message.success {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #A5D6A7;
+}
 
-    .message.error {
-      background: #FFEBEE;
-      color: #C62828;
-      border: 1px solid #EF9A9A;
-    }
+.message.error {
+  background: #FFEBEE;
+  color: #C62828;
+  border: 1px solid #EF9A9A;
+}
 
-    .history-section {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+.history-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    .history-list {
-      max-height: 316px;
-      overflow-y: auto;
-      border-radius: 8px;
-      background: #f0f0f0;
-    }
+.history-list {
+  max-height: 324px;
+  overflow-y: auto;
+  border-radius: 8px;
+  background: #f0f0f0;
+}
 
-    .history-item {
-      padding: 0px 0px 0px 12px;
-      cursor: pointer;
-      font-size: 11px;
-      border-bottom: 1px solid #fff;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      position: relative;
-    }
+.history-item {
+  padding: 0px 0px 0px 12px;
+  cursor: pointer;
+  font-size: 11px;
+  border-bottom: 1px solid #fff;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  position: relative;
+}
 
-    .history-item.hidden {
-      display: none;
-    }
+.history-item.hidden {
+  display: none;
+}
 
-    .history-item:last-child {
-      border-bottom: none;
-    }
+.history-item:last-child {
+  border-bottom: none;
+}
 
-    .history-item:hover {
-      background: rgba(0, 0, 0, 0.05);
-    }
+.history-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
 
-    .history-item:active {
-      background: #e8e8e8;
-    }
+.history-item:active {
+  background: #e8e8e8;
+}
 
-    .history-item-domain {
-      flex: 1;
-    }
+.history-item-domain {
+  flex: 1;
+}
 
-    .delete-btn {
-      opacity: 0;
-      width: 36px;
-      height: 36px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #999;
-      transition: opacity 0.2s, color 0.2s;
-      font-size: 20px;
-      line-height: 1;
-      border-radius: 8px 0px 0px 8px;
-      font-weight: 400;
-    }
+.delete-btn {
+  opacity: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  transition: opacity 0.2s, color 0.2s;
+  font-size: 20px;
+  line-height: 1;
+  border-radius: 8px 0px 0px 8px;
+  font-weight: 400;
+}
 
-    .history-item:hover .delete-btn {
-      opacity: 1;
-    }
+.history-item:hover .delete-btn {
+  opacity: 1;
+}
 
-    .delete-btn:hover {
-      color: #000;
-      background: rgba(0, 0, 0, 0.05);
-    }
+.delete-btn:hover {
+  color: #000;
+  background: rgba(0, 0, 0, 0.05);
+}
 
-    .history-empty {
-      padding: 16px;
-      text-align: center;
-      color: #999;
-      font-size: 11px;
-    }
+.history-empty {
+  padding: 16px;
+  text-align: center;
+  color: #999;
+  font-size: 11px;
+}
 
-    .size-selector {
-      display: inline-flex;
-      background: #f0f0f0;
-      border-radius: 8px;
-      padding: 2px;
-      gap: 0;
-    }
+.size-selector {
+  display: inline-flex;
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 2px;
+  gap: 0;
+}
 
-    .size-option {
-      padding: 6px 16px;
-      cursor: pointer;
-      font-size: 11px;
-      color: #333;
-      border-radius: 6px;
-      transition: all 0.2s;
-      border: none;
-      background: transparent;
-      font-family: inherit;
-      font-weight: 500;
-    }
+.size-option {
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #333;
+  border-radius: 6px;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-weight: 500;
+}
 
-    .size-option.active {
-      background: #ffffff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      color: #000;
-    }
+.size-option.active {
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  color: #000;
+}
 
-    .size-option:hover:not(.active) {
-      background: rgba(0, 0, 0, 0.05);
-    }
+.size-option:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.05);
+}
 
-    .version-footer {
-      text-align: center;
-      color: #aaa;
-      padding-top: 16px;
-      padding-bottom: 8px;
-      font-size: 11px;
-    }
+.version-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #aaa;
+  padding-top: 8px;
+  padding-bottom: 16px;
+  font-size: 11px;
+}
+
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="input-group">
-      <label for="domain">Enter domain</label>
-      <input 
-        type="text" 
-        id="domain" 
-        placeholder="example.com"
-        autocomplete="off"
-      />
-    </div>
-
-    <div class="actions-row">
-      <div class="size-selector">
-        <button class="size-option active" data-size="32" id="size32">32</button>
-        <button class="size-option" data-size="120" id="size120">120</button>
-      </div>
-      <button class="button" id="loadBtn">Load Favicon</button>
-    </div>
-    
-    <div class="message" id="message"></div>
-
-    <div class="history-section">
-      <div class="history-list" id="historyList">
-        <div class="history-empty">No history</div>
-      </div>
-    </div>
-  </div>
+  <div id="app"></div>
 
   <div class="version-footer">
     Version 27 January 2025
   </div>
 
   <script>
-    const domainInput = document.getElementById('domain');
-    const loadBtn = document.getElementById('loadBtn');
-    const message = document.getElementById('message');
-    const historyList = document.getElementById('historyList');
-    const size32Btn = document.getElementById('size32');
-    const size120Btn = document.getElementById('size120');
+"use strict";
+(() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
 
-    let isLoading = false;
-    let selectedSize = '32';
-    let fullHistory = []; // Store complete history for filtering
-
-    // Get selected size
-    function getSelectedSize() {
-      return selectedSize;
+  // src/ui/components/Component.ts
+  var Component = class _Component {
+    constructor(props = {}) {
+      this.element = null;
+      this.children = [];
+      this.props = props;
     }
-
-    // Set selected size
-    function setSelectedSize(size) {
-      selectedSize = size;
-      size32Btn.classList.toggle('active', size === '32');
-      size120Btn.classList.toggle('active', size === '120');
+    /**
+     * Mount the component to a parent element
+     */
+    mount(parent2) {
+      this.element = this.render();
+      parent2.appendChild(this.element);
+      this.onMount();
     }
-
-    // Save size preference
-    function saveSize(size) {
-      parent.postMessage({ 
-        pluginMessage: { 
-          type: 'save-size', 
-          size: size 
-        } 
-      }, '*');
+    /**
+     * Unmount the component from its parent
+     */
+    unmount() {
+      this.onUnmount();
+      this.children.forEach((child) => child.unmount());
+      this.children = [];
+      if (this.element && this.element.parentNode) {
+        this.element.parentNode.removeChild(this.element);
+      }
+      this.element = null;
     }
-
-    // Handle size change
-    size32Btn.addEventListener('click', () => {
-      setSelectedSize('32');
-      saveSize('32');
-    });
-
-    size120Btn.addEventListener('click', () => {
-      setSelectedSize('120');
-      saveSize('120');
-    });
-
-    // Show message (errors only)
-    function showMessage(text, type) {
-      if (type === 'error') {
-        message.textContent = text;
-        message.className = `message show ${type}`;
-        
-        setTimeout(() => {
-          message.className = 'message';
-        }, 3000);
+    /**
+     * Update component props and re-render
+     */
+    update(newProps) {
+      const oldProps = this.props;
+      this.props = __spreadValues(__spreadValues({}, this.props), newProps);
+      if (this.shouldUpdate(oldProps, this.props)) {
+        this.rerender();
       }
     }
-
-    // Load favicon
-    function loadFavicon(domain) {
-      if (isLoading) return;
-      
-      if (!domain) {
-        domain = domainInput.value.trim();
-      }
-      
-      if (!domain) {
-        showMessage('Please enter a domain', 'error');
-        return;
-      }
-
-      const size = getSelectedSize();
-
-      isLoading = true;
-      loadBtn.disabled = true;
-      loadBtn.textContent = 'Loading...';
-      message.className = 'message';
-
-      parent.postMessage({ 
-        pluginMessage: { 
-          type: 'load-favicon', 
-          domain: domain,
-          size: size
-        } 
-      }, '*');
-    }
-
-    // Button handler
-    loadBtn.addEventListener('click', () => loadFavicon());
-
-    // Enter key handler in input field
-    domainInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        loadFavicon();
-      }
-    });
-
-    // Filter history as user types
-    domainInput.addEventListener('input', (e) => {
-      filterHistory(e.target.value.trim().toLowerCase());
-    });
-
-    // Filter history based on search term
-    function filterHistory(searchTerm) {
-      const items = historyList.querySelectorAll('.history-item');
-      let hasVisibleItems = false;
-
-      items.forEach(item => {
-        const domain = item.getAttribute('data-domain').toLowerCase();
-        const matches = !searchTerm || domain.includes(searchTerm);
-        
-        if (matches) {
-          item.classList.remove('hidden');
-          hasVisibleItems = true;
-        } else {
-          item.classList.add('hidden');
-        }
-      });
-
-      // Show "No matches" message if search term exists but no matches
-      if (searchTerm && !hasVisibleItems && fullHistory.length > 0) {
-        const emptyMsg = historyList.querySelector('.history-empty');
-        if (emptyMsg) {
-          emptyMsg.textContent = 'No matching domains';
-          emptyMsg.style.display = 'block';
-        } else {
-          const noMatchDiv = document.createElement('div');
-          noMatchDiv.className = 'history-empty';
-          noMatchDiv.textContent = 'No matching domains';
-          historyList.appendChild(noMatchDiv);
-        }
+    /**
+     * Re-render the component in place
+     */
+    rerender() {
+      if (!this.element || !this.element.parentNode) return;
+      const parent2 = this.element.parentNode;
+      const nextSibling = this.element.nextSibling;
+      this.unmount();
+      this.element = this.render();
+      if (nextSibling) {
+        parent2.insertBefore(this.element, nextSibling);
       } else {
-        const emptyMsg = historyList.querySelector('.history-empty');
-        if (emptyMsg && fullHistory.length > 0) {
-          emptyMsg.style.display = 'none';
+        parent2.appendChild(this.element);
+      }
+      this.onMount();
+    }
+    /**
+     * Lifecycle hook called after component is mounted
+     */
+    onMount() {
+    }
+    /**
+     * Lifecycle hook called before component is unmounted
+     */
+    onUnmount() {
+    }
+    /**
+     * Determine if component should update
+     */
+    shouldUpdate(oldProps, newProps) {
+      return JSON.stringify(oldProps) !== JSON.stringify(newProps);
+    }
+    /**
+     * Helper to create DOM elements
+     */
+    createElement(tag, attrs = {}, ...children) {
+      const element = document.createElement(tag);
+      Object.entries(attrs).forEach(([key, value]) => {
+        if (key === "className") {
+          element.className = value;
+        } else if (key === "style" && typeof value === "object") {
+          Object.assign(element.style, value);
+        } else if (key.startsWith("on") && typeof value === "function") {
+          const eventName = key.substring(2).toLowerCase();
+          element.addEventListener(eventName, value);
+        } else if (key === "disabled" || key === "checked" || key === "selected") {
+          if (value) {
+            element.setAttribute(key, "");
+          } else {
+            element.removeAttribute(key);
+          }
+        } else {
+          element.setAttribute(key, value);
+        }
+      });
+      children.forEach((child) => {
+        if (typeof child === "string") {
+          element.appendChild(document.createTextNode(child));
+        } else if (child instanceof HTMLElement) {
+          element.appendChild(child);
+        } else if (child instanceof _Component) {
+          this.children.push(child);
+          child.mount(element);
+        }
+      });
+      return element;
+    }
+    /**
+     * Get the component's root element
+     */
+    getElement() {
+      return this.element;
+    }
+  };
+
+  // src/ui/components/DomainInput.ts
+  var DomainInput = class extends Component {
+    render() {
+      const container = this.createElement("div", { className: "input-group" });
+      const label = this.createElement("label", { for: "domain" }, "Enter domain");
+      const input = this.createElement("input", {
+        type: "text",
+        id: "domain",
+        placeholder: this.props.placeholder || "example.com",
+        value: this.props.value || "",
+        autocomplete: "off",
+        onInput: (e) => {
+          const target = e.target;
+          if (this.props.onInput) {
+            this.props.onInput(target.value);
+          }
+        },
+        onKeypress: (e) => {
+          if (e.key === "Enter") {
+            const target = e.target;
+            if (this.props.onEnter) {
+              this.props.onEnter(target.value);
+            }
+          }
+        }
+      });
+      this.inputElement = input;
+      container.appendChild(label);
+      container.appendChild(input);
+      return container;
+    }
+    getValue() {
+      var _a;
+      return ((_a = this.inputElement) == null ? void 0 : _a.value) || "";
+    }
+    setValue(value) {
+      if (this.inputElement) {
+        this.inputElement.value = value;
+      }
+    }
+    clear() {
+      this.setValue("");
+    }
+  };
+
+  // src/ui/components/SizeSelector.ts
+  var SizeSelector = class extends Component {
+    render() {
+      const container = this.createElement("div", { className: "size-selector" });
+      const size32Btn = this.createElement(
+        "button",
+        {
+          className: `size-option ${this.props.selectedSize === "32" ? "active" : ""}`,
+          "data-size": "32",
+          id: "size32",
+          onClick: () => this.props.onSizeChange("32")
+        },
+        "32"
+      );
+      const size120Btn = this.createElement(
+        "button",
+        {
+          className: `size-option ${this.props.selectedSize === "120" ? "active" : ""}`,
+          "data-size": "120",
+          id: "size120",
+          onClick: () => this.props.onSizeChange("120")
+        },
+        "120"
+      );
+      container.appendChild(size32Btn);
+      container.appendChild(size120Btn);
+      return container;
+    }
+  };
+
+  // src/ui/components/Button.ts
+  var Button = class extends Component {
+    render() {
+      return this.createElement(
+        "button",
+        {
+          className: `button ${this.props.className || ""}`,
+          disabled: this.props.disabled || false,
+          onClick: this.props.onClick
+        },
+        this.props.text
+      );
+    }
+  };
+
+  // src/ui/components/Message.ts
+  var Message = class extends Component {
+    render() {
+      const classes = ["message"];
+      if (this.props.visible) {
+        classes.push("show");
+      }
+      if (this.props.type) {
+        classes.push(this.props.type);
+      }
+      return this.createElement(
+        "div",
+        {
+          className: classes.join(" "),
+          id: "message"
+        },
+        this.props.text || ""
+      );
+    }
+    onMount() {
+      if (this.props.visible && this.props.type === "error") {
+        this.scheduleHide();
+      }
+    }
+    onUnmount() {
+      if (this.hideTimeout) {
+        clearTimeout(this.hideTimeout);
+      }
+    }
+    scheduleHide() {
+      if (this.hideTimeout) {
+        clearTimeout(this.hideTimeout);
+      }
+      this.hideTimeout = window.setTimeout(() => {
+        this.update({ visible: false });
+      }, 3e3);
+    }
+    update(newProps) {
+      super.update(newProps);
+      if (newProps.visible && this.props.type === "error") {
+        this.scheduleHide();
+      }
+    }
+  };
+
+  // src/ui/components/HistoryItem.ts
+  var HistoryItem = class extends Component {
+    render() {
+      const classes = ["history-item"];
+      if (this.props.hidden) {
+        classes.push("hidden");
+      }
+      const item = this.createElement(
+        "div",
+        {
+          className: classes.join(" "),
+          "data-domain": this.props.domain,
+          onClick: (e) => {
+            const target = e.target;
+            if (!target.classList.contains("delete-btn")) {
+              this.props.onClick(this.props.domain);
+            }
+          }
+        }
+      );
+      const domainSpan = this.createElement(
+        "span",
+        {
+          className: "history-item-domain"
+        },
+        this.props.domain
+      );
+      const deleteBtn = this.createElement(
+        "button",
+        {
+          className: "delete-btn",
+          "data-domain": this.props.domain,
+          onClick: (e) => {
+            e.stopPropagation();
+            this.props.onDelete(this.props.domain);
+          }
+        },
+        "\xD7"
+      );
+      item.appendChild(domainSpan);
+      item.appendChild(deleteBtn);
+      return item;
+    }
+  };
+
+  // src/ui/components/HistoryList.ts
+  var HistoryList = class extends Component {
+    render() {
+      const container = this.createElement("div", { className: "history-section" });
+      const listContainer = this.createElement("div", {
+        className: "history-list",
+        id: "historyList"
+      });
+      if (!this.props.history || this.props.history.length === 0) {
+        const emptyDiv = this.createElement("div", { className: "history-empty" }, "No history");
+        listContainer.appendChild(emptyDiv);
+      } else {
+        let hasVisibleItems = false;
+        this.props.history.forEach((domain) => {
+          const searchTerm = this.props.searchTerm.toLowerCase();
+          const matches = !searchTerm || domain.toLowerCase().includes(searchTerm);
+          if (matches) {
+            hasVisibleItems = true;
+          }
+          const item = new HistoryItem({
+            domain,
+            onClick: this.props.onItemClick,
+            onDelete: this.props.onItemDelete,
+            hidden: !matches
+          });
+          item.mount(listContainer);
+        });
+        if (this.props.searchTerm && !hasVisibleItems) {
+          const noMatchDiv = this.createElement("div", { className: "history-empty" }, "No matching domains");
+          listContainer.appendChild(noMatchDiv);
         }
       }
+      container.appendChild(listContainer);
+      return container;
     }
+  };
 
-    // Delete domain from history
-    function deleteDomain(domain) {
-      parent.postMessage({ 
-        pluginMessage: { 
-          type: 'delete-domain', 
-          domain: domain 
-        } 
-      }, '*');
+  // src/ui/state/Store.ts
+  var Store = class {
+    constructor(initialState) {
+      this.listeners = /* @__PURE__ */ new Set();
+      this.state = initialState;
     }
+    /**
+     * Get the current state
+     */
+    getState() {
+      return __spreadValues({}, this.state);
+    }
+    /**
+     * Update the state and notify listeners
+     */
+    setState(partial) {
+      const oldState = this.state;
+      this.state = __spreadValues(__spreadValues({}, this.state), partial);
+      if (JSON.stringify(oldState) !== JSON.stringify(this.state)) {
+        this.notifyListeners();
+      }
+    }
+    /**
+     * Subscribe to state changes
+     * Returns an unsubscribe function
+     */
+    subscribe(listener) {
+      this.listeners.add(listener);
+      return () => {
+        this.listeners.delete(listener);
+      };
+    }
+    /**
+     * Notify all listeners of state change
+     */
+    notifyListeners() {
+      this.listeners.forEach((listener) => {
+        listener(this.getState());
+      });
+    }
+    // Convenience methods for specific state updates
+    setSelectedSize(size) {
+      this.setState({ selectedSize: size });
+    }
+    setLoading(isLoading) {
+      this.setState({ isLoading });
+    }
+    setHistory(history) {
+      this.setState({ history });
+    }
+    setSearchTerm(searchTerm) {
+      this.setState({ searchTerm });
+    }
+    setMessage(text, type) {
+      this.setState({ message: { text, type } });
+    }
+    clearMessage() {
+      this.setState({ message: void 0 });
+    }
+  };
+  var store = new Store({
+    selectedSize: "32",
+    isLoading: false,
+    history: [],
+    searchTerm: "",
+    message: void 0
+  });
 
-    // Display history
-    function displayHistory(history) {
-      fullHistory = history || []; // Store full history
-      
-      if (!fullHistory || fullHistory.length === 0) {
-        historyList.innerHTML = '<div class="history-empty">No history</div>';
+  // src/ui/App.ts
+  var App = class extends Component {
+    constructor() {
+      super({});
+      this.setupMessageListener();
+      this.requestInitialData();
+    }
+    render() {
+      var _a, _b;
+      const root = this.createElement("div", { className: "container" });
+      this.domainInput = new DomainInput({
+        placeholder: "example.com",
+        onInput: (value) => {
+          store.setSearchTerm(value.trim().toLowerCase());
+        },
+        onEnter: (value) => {
+          this.loadFavicon(value);
+        }
+      });
+      this.domainInput.mount(root);
+      const actionsRow = this.createElement("div", { className: "actions-row" });
+      const state = store.getState();
+      this.sizeSelector = new SizeSelector({
+        selectedSize: state.selectedSize,
+        onSizeChange: (size) => {
+          store.setSelectedSize(size);
+          this.sendMessage({ type: "save-size", size });
+        }
+      });
+      this.sizeSelector.mount(actionsRow);
+      this.loadButton = new Button({
+        text: "Load Favicon",
+        disabled: state.isLoading,
+        onClick: () => {
+          this.loadFavicon(this.domainInput.getValue());
+        }
+      });
+      this.loadButton.mount(actionsRow);
+      root.appendChild(actionsRow);
+      this.messageComponent = new Message({
+        text: (_a = state.message) == null ? void 0 : _a.text,
+        type: (_b = state.message) == null ? void 0 : _b.type,
+        visible: !!state.message
+      });
+      this.messageComponent.mount(root);
+      this.historyList = new HistoryList({
+        history: state.history,
+        searchTerm: state.searchTerm,
+        onItemClick: (domain) => {
+          this.loadFavicon(domain);
+        },
+        onItemDelete: (domain) => {
+          this.sendMessage({ type: "delete-domain", domain });
+        }
+      });
+      this.historyList.mount(root);
+      return root;
+    }
+    onMount() {
+      this.unsubscribe = store.subscribe((state) => {
+        this.handleStateChange(state);
+      });
+    }
+    onUnmount() {
+      if (this.unsubscribe) {
+        this.unsubscribe();
+      }
+    }
+    handleStateChange(state) {
+      var _a, _b;
+      this.sizeSelector.update({ selectedSize: state.selectedSize });
+      this.loadButton.update({
+        text: state.isLoading ? "Loading..." : "Load Favicon",
+        disabled: state.isLoading
+      });
+      this.messageComponent.update({
+        text: (_a = state.message) == null ? void 0 : _a.text,
+        type: (_b = state.message) == null ? void 0 : _b.type,
+        visible: !!state.message
+      });
+      this.historyList.update({
+        history: state.history,
+        searchTerm: state.searchTerm,
+        onItemClick: (domain) => this.loadFavicon(domain),
+        onItemDelete: (domain) => this.sendMessage({ type: "delete-domain", domain })
+      });
+    }
+    loadFavicon(domain) {
+      const trimmedDomain = domain.trim();
+      if (!trimmedDomain) {
+        store.setMessage("Please enter a domain", "error");
         return;
       }
-
-      historyList.innerHTML = fullHistory.map(domain => 
-        `<div class="history-item" data-domain="${domain}">
-          <span class="history-item-domain">${domain}</span>
-          <button class="delete-btn" data-domain="${domain}">×</button>
-        </div>`
-      ).join('');
-
-      // Add click handlers - directly load favicon
-      historyList.querySelectorAll('.history-item').forEach(item => {
-        const domainSpan = item.querySelector('.history-item-domain');
-        const deleteBtn = item.querySelector('.delete-btn');
-        const domain = item.getAttribute('data-domain');
-
-        domainSpan.addEventListener('click', (e) => {
-          e.stopPropagation();
-          loadFavicon(domain);
-        });
-
-        item.addEventListener('click', (e) => {
-          // Only load if not clicking delete button
-          if (!e.target.classList.contains('delete-btn')) {
-            loadFavicon(domain);
-          }
-        });
-
-        deleteBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          deleteDomain(domain);
-        });
+      const state = store.getState();
+      store.setLoading(true);
+      store.clearMessage();
+      this.sendMessage({
+        type: "load-favicon",
+        domain: trimmedDomain,
+        size: state.selectedSize
       });
-
-      // Apply current filter if input has text
-      const currentSearch = domainInput.value.trim().toLowerCase();
-      if (currentSearch) {
-        filterHistory(currentSearch);
+    }
+    setupMessageListener() {
+      window.onmessage = (event) => {
+        const msg = event.data.pluginMessage;
+        this.handlePluginMessage(msg);
+      };
+    }
+    handlePluginMessage(msg) {
+      switch (msg.type) {
+        case "favicon-loaded":
+          this.handleFaviconLoaded(msg);
+          break;
+        case "error":
+          this.handleError(msg);
+          break;
+        case "history-loaded":
+          this.handleHistoryLoaded(msg);
+          break;
+        case "size-loaded":
+          this.handleSizeLoaded(msg);
+          break;
       }
     }
+    handleFaviconLoaded(_msg) {
+      store.setLoading(false);
+      this.domainInput.clear();
+      store.setSearchTerm("");
+    }
+    handleError(msg) {
+      store.setLoading(false);
+      store.setMessage(msg.message || "Error occurred", "error");
+    }
+    handleHistoryLoaded(msg) {
+      store.setHistory(msg.history);
+    }
+    handleSizeLoaded(msg) {
+      store.setSelectedSize(msg.size);
+    }
+    sendMessage(msg) {
+      parent.postMessage({ pluginMessage: msg }, "*");
+    }
+    requestInitialData() {
+      this.sendMessage({ type: "get-history" });
+    }
+  };
 
-    // Handle messages from plugin
-    window.onmessage = async (event) => {
-      const msg = event.data.pluginMessage;
-      
-      if (msg.type === 'favicon-loaded') {
-        isLoading = false;
-        loadBtn.disabled = false;
-        loadBtn.textContent = 'Load Favicon';
-        // No success message - silent success
-        domainInput.value = '';
-        // Reset filter to show all history items
-        filterHistory('');
-      } else if (msg.type === 'error') {
-        isLoading = false;
-        loadBtn.disabled = false;
-        loadBtn.textContent = 'Load Favicon';
-        showMessage(msg.message || 'Error occurred', 'error');
-      } else if (msg.type === 'history-loaded') {
-        displayHistory(msg.history);
-      } else if (msg.type === 'size-loaded') {
-        // Set segmented control based on saved size
-        setSelectedSize(msg.size);
-      }
-    };
+  // src/ui/index.ts
+  document.addEventListener("DOMContentLoaded", () => {
+    const appRoot = document.getElementById("app");
+    if (appRoot) {
+      const app = new App();
+      app.mount(appRoot);
+    }
+  });
+  if (document.readyState === "loading") {
+  } else {
+    const appRoot = document.getElementById("app");
+    if (appRoot) {
+      const app = new App();
+      app.mount(appRoot);
+    }
+  }
+})();
 
-    // Request history on load
-    parent.postMessage({ 
-      pluginMessage: { type: 'get-history' } 
-    }, '*');
   </script>
 </body>
 </html>

@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "description": "Figma plugin to load favicons from websites",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch"
+    "build": "npm run build:plugin && npm run build:ui",
+    "build:plugin": "tsc",
+    "build:ui": "node build-ui.js",
+    "watch": "tsc --watch",
+    "watch:ui": "node build-ui.js --watch"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@figma/plugin-typings": "^1.92.0",
+    "esbuild": "^0.27.2",
     "typescript": "^5.3.3"
   }
 }
