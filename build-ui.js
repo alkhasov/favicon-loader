@@ -53,10 +53,6 @@ ${css}
 <body>
   <div id="app"></div>
 
-  <div class="version-footer">
-    Version 27 January 2025
-  </div>
-
   <script>
 ${js}
   </script>

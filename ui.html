@@ -248,14 +248,155 @@ input[type="text"]::placeholder {
   font-size: 11px;
 }
 
+.footer-link {
+  color: #aaa;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: #000;
+}
+
+.footer-separator {
+  color: #aaa;
+}
+
+.footer-version {
+  color: #aaa;
+}
+
+/* App Root */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Switcher Component */
+.switcher {
+  position: relative;
+  width: 53px;
+  height: 21px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.switcher:hover {
+  background: #e8e8e8;
+}
+
+.switcher.active {
+  background: #4A9EF4;
+}
+
+.switcher.active:hover {
+  background: #3d8ce0;
+}
+
+.switcher.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.switcher-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 25px;
+  height: 17px;
+  background: white;
+  border-radius: 6px;
+  transition: left 0.2s;
+}
+
+.switcher.active .switcher-knob {
+  left: 26px;
+}
+
+/* Settings Page */
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.settings-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Settings Item */
+.settings-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 47px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  gap: 12px;
+}
+
+.settings-item:first-child {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.settings-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 1px;
+}
+
+.settings-item-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: #000;
+  line-height: 13px;
+}
+
+.settings-item-description {
+  font-size: 11px;
+  font-weight: 400;
+  color: #000;
+  opacity: 0.3;
+  line-height: 13px;
+}
+
+.settings-item-control {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Settings Button Container */
+.settings-button-container {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.settings-button-container .button {
+  width: 100%;
+}
+
   </style>
 </head>
 <body>
   <div id="app"></div>
-
-  <div class="version-footer">
-    Version 27 January 2025
-  </div>
 
   <script>
 "use strict";
@@ -442,36 +583,6 @@ input[type="text"]::placeholder {
     }
   };
 
-  // src/ui/components/SizeSelector.ts
-  var SizeSelector = class extends Component {
-    render() {
-      const container = this.createElement("div", { className: "size-selector" });
-      const size32Btn = this.createElement(
-        "button",
-        {
-          className: `size-option ${this.props.selectedSize === "32" ? "active" : ""}`,
-          "data-size": "32",
-          id: "size32",
-          onClick: () => this.props.onSizeChange("32")
-        },
-        "32"
-      );
-      const size120Btn = this.createElement(
-        "button",
-        {
-          className: `size-option ${this.props.selectedSize === "120" ? "active" : ""}`,
-          "data-size": "120",
-          id: "size120",
-          onClick: () => this.props.onSizeChange("120")
-        },
-        "120"
-      );
-      container.appendChild(size32Btn);
-      container.appendChild(size120Btn);
-      return container;
-    }
-  };
-
   // src/ui/components/Button.ts
   var Button = class extends Component {
     render() {
@@ -614,6 +725,227 @@ input[type="text"]::placeholder {
     }
   };
 
+  // src/ui/components/SettingsItem.ts
+  var SettingsItem = class extends Component {
+    constructor() {
+      super(...arguments);
+      this.controlContainer = null;
+    }
+    render() {
+      const container = this.createElement("div", { className: "settings-item" });
+      const info = this.createElement("div", { className: "settings-item-info" });
+      const title = this.createElement("p", {
+        className: "settings-item-title"
+      }, this.props.title);
+      const description = this.createElement("p", {
+        className: "settings-item-description"
+      }, this.props.description);
+      info.appendChild(title);
+      info.appendChild(description);
+      this.controlContainer = this.createElement("div", {
+        className: "settings-item-control"
+      });
+      container.appendChild(info);
+      container.appendChild(this.controlContainer);
+      return container;
+    }
+    /**
+     * Get the control container to mount child components
+     */
+    getControlContainer() {
+      return this.controlContainer;
+    }
+  };
+
+  // src/ui/components/SizeSelector.ts
+  var SizeSelector = class extends Component {
+    render() {
+      const container = this.createElement("div", { className: "size-selector" });
+      this.size32Btn = this.createElement(
+        "button",
+        {
+          className: `size-option ${this.props.selectedSize === "32" ? "active" : ""}`,
+          "data-size": "32",
+          id: "size32",
+          onClick: () => this.props.onSizeChange("32")
+        },
+        "32"
+      );
+      this.size120Btn = this.createElement(
+        "button",
+        {
+          className: `size-option ${this.props.selectedSize === "120" ? "active" : ""}`,
+          "data-size": "120",
+          id: "size120",
+          onClick: () => this.props.onSizeChange("120")
+        },
+        "120"
+      );
+      container.appendChild(this.size32Btn);
+      container.appendChild(this.size120Btn);
+      return container;
+    }
+    /**
+     * Override update to efficiently update the visual state without full rerender
+     */
+    update(newProps) {
+      const sizeChanged = newProps.selectedSize !== void 0 && newProps.selectedSize !== this.props.selectedSize;
+      this.props = __spreadValues(__spreadValues({}, this.props), newProps);
+      if (sizeChanged && this.size32Btn && this.size120Btn) {
+        if (this.props.selectedSize === "32") {
+          this.size32Btn.classList.add("active");
+          this.size120Btn.classList.remove("active");
+        } else {
+          this.size32Btn.classList.remove("active");
+          this.size120Btn.classList.add("active");
+        }
+      }
+    }
+  };
+
+  // src/ui/components/Switcher.ts
+  var Switcher = class extends Component {
+    render() {
+      const container = this.createElement("button", {
+        className: `switcher ${this.props.checked ? "active" : ""} ${this.props.disabled ? "disabled" : ""}`,
+        onClick: () => {
+          if (!this.props.disabled) {
+            this.props.onChange(!this.props.checked);
+          }
+        },
+        disabled: this.props.disabled,
+        type: "button",
+        "aria-checked": this.props.checked ? "true" : "false",
+        role: "switch"
+      });
+      const knob = this.createElement("div", {
+        className: "switcher-knob"
+      });
+      container.appendChild(knob);
+      return container;
+    }
+    /**
+     * Override update to efficiently update the visual state without full rerender
+     */
+    update(newProps) {
+      const checkedChanged = newProps.checked !== void 0 && newProps.checked !== this.props.checked;
+      this.props = __spreadValues(__spreadValues({}, this.props), newProps);
+      if (checkedChanged && this.element) {
+        if (this.props.checked) {
+          this.element.classList.add("active");
+        } else {
+          this.element.classList.remove("active");
+        }
+        this.element.setAttribute("aria-checked", this.props.checked ? "true" : "false");
+      }
+    }
+  };
+
+  // src/ui/components/SettingsPage.ts
+  var SettingsPage = class extends Component {
+    constructor(props) {
+      super(props);
+      this.currentSettings = __spreadValues({}, props.settings);
+    }
+    render() {
+      const container = this.createElement("div", { className: "settings-page" });
+      const title = this.createElement("h1", {
+        className: "settings-title"
+      }, "Settings");
+      container.appendChild(title);
+      const settingsList = this.createElement("div", { className: "settings-list" });
+      this.sizeSelectorItem = new SettingsItem({
+        title: "Favicon size",
+        description: "If it's available on domain"
+      });
+      this.sizeSelectorItem.mount(settingsList);
+      this.sizeSelector = new SizeSelector({
+        selectedSize: this.currentSettings.selectedSize,
+        onSizeChange: (size) => {
+          this.currentSettings.selectedSize = size;
+          this.sizeSelector.update({ selectedSize: size });
+        }
+      });
+      const sizeControl = this.sizeSelectorItem.getControlContainer();
+      if (sizeControl) {
+        this.sizeSelector.mount(sizeControl);
+      }
+      this.replaceAllFillsItem = new SettingsItem({
+        title: "Replace all fills with favicon",
+        description: "Reduce cluttering"
+      });
+      this.replaceAllFillsItem.mount(settingsList);
+      this.replaceAllFillsSwitcher = new Switcher({
+        checked: this.currentSettings.replaceAllFills,
+        onChange: (checked) => {
+          this.currentSettings.replaceAllFills = checked;
+          this.replaceAllFillsSwitcher.update({ checked });
+        }
+      });
+      const replaceControl = this.replaceAllFillsItem.getControlContainer();
+      if (replaceControl) {
+        this.replaceAllFillsSwitcher.mount(replaceControl);
+      }
+      this.addBlackOverlayItem = new SettingsItem({
+        title: "Add 5% black on top",
+        description: "Looks better most of the time"
+      });
+      this.addBlackOverlayItem.mount(settingsList);
+      this.addBlackOverlaySwitcher = new Switcher({
+        checked: this.currentSettings.addBlackOverlay,
+        onChange: (checked) => {
+          this.currentSettings.addBlackOverlay = checked;
+          this.addBlackOverlaySwitcher.update({ checked });
+        }
+      });
+      const overlayControl = this.addBlackOverlayItem.getControlContainer();
+      if (overlayControl) {
+        this.addBlackOverlaySwitcher.mount(overlayControl);
+      }
+      container.appendChild(settingsList);
+      const buttonContainer = this.createElement("div", { className: "settings-button-container" });
+      this.saveButton = new Button({
+        text: "OK",
+        onClick: () => {
+          this.props.onSave(this.currentSettings);
+        }
+      });
+      this.saveButton.mount(buttonContainer);
+      container.appendChild(buttonContainer);
+      return container;
+    }
+    update(newProps) {
+      if (newProps.settings) {
+        this.currentSettings = __spreadValues({}, newProps.settings);
+      }
+      super.update(newProps);
+    }
+  };
+
+  // src/ui/components/Footer.ts
+  var Footer = class extends Component {
+    render() {
+      const container = this.createElement("div", { className: "version-footer" });
+      if (this.props.showSettingsLink) {
+        const settingsLink = this.createElement("a", {
+          className: "footer-link",
+          href: "#",
+          onClick: (e) => {
+            e.preventDefault();
+            this.props.onSettingsClick();
+          }
+        }, "Change settings");
+        container.appendChild(settingsLink);
+      } else {
+        const version = this.createElement("span", {
+          className: "footer-version"
+        }, "Version 4 February 2026");
+        container.appendChild(version);
+      }
+      return container;
+    }
+  };
+
   // src/ui/state/Store.ts
   var Store = class {
     constructor(initialState) {
@@ -673,9 +1005,38 @@ input[type="text"]::placeholder {
     clearMessage() {
       this.setState({ message: void 0 });
     }
+    // View navigation
+    setCurrentView(view) {
+      this.setState({ currentView: view });
+    }
+    // Settings methods
+    setReplaceAllFills(replaceAllFills) {
+      this.setState({ replaceAllFills });
+    }
+    setAddBlackOverlay(addBlackOverlay) {
+      this.setState({ addBlackOverlay });
+    }
+    getSettings() {
+      const state = this.getState();
+      return {
+        selectedSize: state.selectedSize,
+        replaceAllFills: state.replaceAllFills,
+        addBlackOverlay: state.addBlackOverlay
+      };
+    }
+    setSettings(settings) {
+      this.setState({
+        selectedSize: settings.selectedSize,
+        replaceAllFills: settings.replaceAllFills,
+        addBlackOverlay: settings.addBlackOverlay
+      });
+    }
   };
   var store = new Store({
+    currentView: "main",
     selectedSize: "32",
+    replaceAllFills: false,
+    addBlackOverlay: false,
     isLoading: false,
     history: [],
     searchTerm: "",
@@ -686,12 +1047,31 @@ input[type="text"]::placeholder {
   var App = class extends Component {
     constructor() {
       super({});
+      this.currentView = "main";
       this.setupMessageListener();
       this.requestInitialData();
     }
     render() {
+      const root = this.createElement("div", { className: "app-root" });
+      const state = store.getState();
+      this.currentView = state.currentView;
+      if (state.currentView === "main") {
+        this.renderMainView(root, state);
+      } else {
+        this.renderSettingsView(root, state);
+      }
+      this.footer = new Footer({
+        showSettingsLink: state.currentView === "main",
+        onSettingsClick: () => {
+          store.setCurrentView("settings");
+        }
+      });
+      this.footer.mount(root);
+      return root;
+    }
+    renderMainView(root, state) {
       var _a, _b;
-      const root = this.createElement("div", { className: "container" });
+      this.mainContainer = this.createElement("div", { className: "container" });
       this.domainInput = new DomainInput({
         placeholder: "example.com",
         onInput: (value) => {
@@ -701,32 +1081,23 @@ input[type="text"]::placeholder {
           this.loadFavicon(value);
         }
       });
-      this.domainInput.mount(root);
+      this.domainInput.mount(this.mainContainer);
       const actionsRow = this.createElement("div", { className: "actions-row" });
-      const state = store.getState();
-      this.sizeSelector = new SizeSelector({
-        selectedSize: state.selectedSize,
-        onSizeChange: (size) => {
-          store.setSelectedSize(size);
-          this.sendMessage({ type: "save-size", size });
-        }
-      });
-      this.sizeSelector.mount(actionsRow);
       this.loadButton = new Button({
-        text: "Load Favicon",
+        text: "Load favicon",
         disabled: state.isLoading,
         onClick: () => {
           this.loadFavicon(this.domainInput.getValue());
         }
       });
       this.loadButton.mount(actionsRow);
-      root.appendChild(actionsRow);
+      this.mainContainer.appendChild(actionsRow);
       this.messageComponent = new Message({
         text: (_a = state.message) == null ? void 0 : _a.text,
         type: (_b = state.message) == null ? void 0 : _b.type,
         visible: !!state.message
       });
-      this.messageComponent.mount(root);
+      this.messageComponent.mount(this.mainContainer);
       this.historyList = new HistoryList({
         history: state.history,
         searchTerm: state.searchTerm,
@@ -737,8 +1108,18 @@ input[type="text"]::placeholder {
           this.sendMessage({ type: "delete-domain", domain });
         }
       });
-      this.historyList.mount(root);
-      return root;
+      this.historyList.mount(this.mainContainer);
+      root.appendChild(this.mainContainer);
+    }
+    renderSettingsView(root, state) {
+      this.settingsPage = new SettingsPage({
+        settings: store.getSettings(),
+        onSave: (settings) => {
+          this.saveSettings(settings);
+          store.setCurrentView("main");
+        }
+      });
+      this.settingsPage.mount(root);
     }
     onMount() {
       this.unsubscribe = store.subscribe((state) => {
@@ -751,22 +1132,31 @@ input[type="text"]::placeholder {
       }
     }
     handleStateChange(state) {
-      var _a, _b;
-      this.sizeSelector.update({ selectedSize: state.selectedSize });
-      this.loadButton.update({
-        text: state.isLoading ? "Loading..." : "Load Favicon",
-        disabled: state.isLoading
-      });
-      this.messageComponent.update({
-        text: (_a = state.message) == null ? void 0 : _a.text,
-        type: (_b = state.message) == null ? void 0 : _b.type,
-        visible: !!state.message
-      });
-      this.historyList.update({
-        history: state.history,
-        searchTerm: state.searchTerm,
-        onItemClick: (domain) => this.loadFavicon(domain),
-        onItemDelete: (domain) => this.sendMessage({ type: "delete-domain", domain })
+      var _a, _b, _c, _d, _e, _f;
+      if (state.currentView !== this.currentView) {
+        this.rerender();
+        return;
+      }
+      if (state.currentView === "main") {
+        (_a = this.loadButton) == null ? void 0 : _a.update({
+          text: state.isLoading ? "Loading..." : "Load favicon",
+          disabled: state.isLoading
+        });
+        (_d = this.messageComponent) == null ? void 0 : _d.update({
+          text: (_b = state.message) == null ? void 0 : _b.text,
+          type: (_c = state.message) == null ? void 0 : _c.type,
+          visible: !!state.message
+        });
+        (_e = this.historyList) == null ? void 0 : _e.update({
+          history: state.history,
+          searchTerm: state.searchTerm,
+          onItemClick: (domain) => this.loadFavicon(domain),
+          onItemDelete: (domain) => this.sendMessage({ type: "delete-domain", domain })
+        });
+      }
+      (_f = this.footer) == null ? void 0 : _f.update({
+        showSettingsLink: state.currentView === "main",
+        onSettingsClick: () => store.setCurrentView("settings")
       });
     }
     loadFavicon(domain) {
@@ -781,8 +1171,14 @@ input[type="text"]::placeholder {
       this.sendMessage({
         type: "load-favicon",
         domain: trimmedDomain,
-        size: state.selectedSize
+        size: state.selectedSize,
+        replaceAllFills: state.replaceAllFills,
+        addBlackOverlay: state.addBlackOverlay
       });
+    }
+    saveSettings(settings) {
+      store.setSettings(settings);
+      this.sendMessage({ type: "save-settings", settings });
     }
     setupMessageListener() {
       window.onmessage = (event) => {
@@ -801,14 +1197,15 @@ input[type="text"]::placeholder {
         case "history-loaded":
           this.handleHistoryLoaded(msg);
           break;
-        case "size-loaded":
-          this.handleSizeLoaded(msg);
+        case "settings-loaded":
+          this.handleSettingsLoaded(msg);
           break;
       }
     }
     handleFaviconLoaded(_msg) {
+      var _a;
       store.setLoading(false);
-      this.domainInput.clear();
+      (_a = this.domainInput) == null ? void 0 : _a.clear();
       store.setSearchTerm("");
     }
     handleError(msg) {
@@ -818,14 +1215,15 @@ input[type="text"]::placeholder {
     handleHistoryLoaded(msg) {
       store.setHistory(msg.history);
     }
-    handleSizeLoaded(msg) {
-      store.setSelectedSize(msg.size);
+    handleSettingsLoaded(msg) {
+      store.setSettings(msg.settings);
     }
     sendMessage(msg) {
       parent.postMessage({ pluginMessage: msg }, "*");
     }
     requestInitialData() {
       this.sendMessage({ type: "get-history" });
+      this.sendMessage({ type: "get-settings" });
     }
   };
 

@@ -1,4 +1,4 @@
-import { AppState } from '../types';
+import { AppState, Settings } from '../types';
 
 type StateListener<T = AppState> = (state: T) => void;
 
@@ -77,11 +77,47 @@ export class Store {
   public clearMessage(): void {
     this.setState({ message: undefined });
   }
+
+  // View navigation
+
+  public setCurrentView(view: 'main' | 'settings'): void {
+    this.setState({ currentView: view });
+  }
+
+  // Settings methods
+
+  public setReplaceAllFills(replaceAllFills: boolean): void {
+    this.setState({ replaceAllFills });
+  }
+
+  public setAddBlackOverlay(addBlackOverlay: boolean): void {
+    this.setState({ addBlackOverlay });
+  }
+
+  public getSettings(): Settings {
+    const state = this.getState();
+    return {
+      selectedSize: state.selectedSize,
+      replaceAllFills: state.replaceAllFills,
+      addBlackOverlay: state.addBlackOverlay,
+    };
+  }
+
+  public setSettings(settings: Settings): void {
+    this.setState({
+      selectedSize: settings.selectedSize,
+      replaceAllFills: settings.replaceAllFills,
+      addBlackOverlay: settings.addBlackOverlay,
+    });
+  }
 }
 
 // Create a singleton store instance
 export const store = new Store({
+  currentView: 'main',
   selectedSize: '32',
+  replaceAllFills: false,
+  addBlackOverlay: false,
   isLoading: false,
   history: [],
   searchTerm: '',

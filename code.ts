@@ -4,7 +4,21 @@ figma.showUI(__html__, { width: 320, height: 500 });
 // Maximum number of domains in history
 const MAX_HISTORY_SIZE = 30;
 const HISTORY_KEY = "domainHistory";
-const SIZE_KEY = "faviconSize";
+const SETTINGS_KEY = "pluginSettings";
+
+// Settings interface
+interface PluginSettings {
+  selectedSize: '32' | '120';
+  replaceAllFills: boolean;
+  addBlackOverlay: boolean;
+}
+
+// Default settings
+const DEFAULT_SETTINGS: PluginSettings = {
+  selectedSize: '32',
+  replaceAllFills: false,
+  addBlackOverlay: false,
+};
 
 // Handle relaunch button
 if (figma.command === 'load-favicon') {
@@ -32,15 +46,16 @@ async function loadAndSendHistory() {
   figma.ui.postMessage({ type: 'history-loaded', history });
 }
 
-// Load and send size preference
-async function loadAndSendSize() {
-  const size = await figma.clientStorage.getAsync(SIZE_KEY) || '32';
-  figma.ui.postMessage({ type: 'size-loaded', size });
+// Load and send settings
+async function loadAndSendSettings() {
+  const stored = await figma.clientStorage.getAsync(SETTINGS_KEY);
+  const settings: PluginSettings = stored ? { ...DEFAULT_SETTINGS, ...stored } : DEFAULT_SETTINGS;
+  figma.ui.postMessage({ type: 'settings-loaded', settings });
 }
 
-// Save size preference
-async function saveSize(size: string) {
-  await figma.clientStorage.setAsync(SIZE_KEY, size);
+// Save settings
+async function saveSettings(settings: PluginSettings) {
+  await figma.clientStorage.setAsync(SETTINGS_KEY, settings);
 }
 
 // Save domain to history
@@ -100,7 +115,11 @@ async function loadFavicon(domain: string, size: string = '32') {
 }
 
 // Insert favicon to selected element
-async function insertFaviconToElement(imageData: Uint8Array) {
+async function insertFaviconToElement(
+  imageData: Uint8Array,
+  replaceAllFills: boolean = false,
+  addBlackOverlay: boolean = false
+) {
   const selection = figma.currentPage.selection;
   
   if (selection.length === 0) {
@@ -117,8 +136,8 @@ async function insertFaviconToElement(imageData: Uint8Array) {
   // Create image
   const image = figma.createImage(imageData);
   
-  // Get current fills
-  const currentFills = Array.isArray(node.fills) ? [...node.fills] : [];
+  // Get current fills or start fresh based on replaceAllFills setting
+  const currentFills = replaceAllFills ? [] : (Array.isArray(node.fills) ? [...node.fills] : []);
   
   // Create new image fill
   const newFill: ImagePaint = {
@@ -127,8 +146,21 @@ async function insertFaviconToElement(imageData: Uint8Array) {
     imageHash: image.hash
   };
   
-  // Add new fill to existing ones
-  node.fills = [...currentFills, newFill];
+  // Build the fills array
+  const fills: Paint[] = [...currentFills, newFill];
+  
+  // Add 5% black overlay on top if enabled
+  if (addBlackOverlay) {
+    const blackOverlay: SolidPaint = {
+      type: 'SOLID',
+      color: { r: 0, g: 0, b: 0 },
+      opacity: 0.05
+    };
+    fills.push(blackOverlay);
+  }
+  
+  // Apply fills
+  node.fills = fills;
   
   // Set relaunch button on the node
   if ('setRelaunchData' in node) {
@@ -144,6 +176,8 @@ figma.ui.onmessage = async (msg) => {
     try {
       const domain = msg.domain;
       const size = msg.size || '32';
+      const replaceAllFills = msg.replaceAllFills || false;
+      const addBlackOverlay = msg.addBlackOverlay || false;
       
       if (!domain) {
         figma.ui.postMessage({ 
@@ -156,8 +190,8 @@ figma.ui.onmessage = async (msg) => {
       // Load favicon with selected size
       const imageData = await loadFavicon(domain, size);
       
-      // Insert into element
-      await insertFaviconToElement(imageData);
+      // Insert into element with settings
+      await insertFaviconToElement(imageData, replaceAllFills, addBlackOverlay);
       
       // Save to history
       await saveDomainToHistory(normalizeDomain(domain));
@@ -174,8 +208,10 @@ figma.ui.onmessage = async (msg) => {
         message: error instanceof Error ? error.message : 'Error loading favicon' 
       });
     }
-  } else if (msg.type === 'save-size') {
-    await saveSize(msg.size);
+  } else if (msg.type === 'save-settings') {
+    await saveSettings(msg.settings);
+  } else if (msg.type === 'get-settings') {
+    await loadAndSendSettings();
   } else if (msg.type === 'delete-domain') {
     await deleteDomainFromHistory(msg.domain);
   } else if (msg.type === 'close') {
@@ -185,6 +221,6 @@ figma.ui.onmessage = async (msg) => {
   }
 };
 
-// Load history and size on startup
+// Load history and settings on startup
 loadAndSendHistory();
-loadAndSendSize();
+loadAndSendSettings();

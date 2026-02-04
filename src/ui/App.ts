@@ -4,22 +4,28 @@ import { SizeSelector } from './components/SizeSelector';
 import { Button } from './components/Button';
 import { Message } from './components/Message';
 import { HistoryList } from './components/HistoryList';
+import { SettingsPage } from './components/SettingsPage';
+import { Footer } from './components/Footer';
 import { store } from './state/Store';
 import {
   PluginMessage,
   FaviconLoadedMessage,
   ErrorMessage,
   HistoryLoadedMessage,
-  SizeLoadedMessage,
+  SettingsLoadedMessage,
+  Settings,
 } from './types';
 
 export class App extends Component {
   private domainInput!: DomainInput;
-  private sizeSelector!: SizeSelector;
   private loadButton!: Button;
   private messageComponent!: Message;
   private historyList!: HistoryList;
+  private settingsPage!: SettingsPage;
+  private footer!: Footer;
+  private mainContainer!: HTMLElement;
   private unsubscribe?: () => void;
+  private currentView: 'main' | 'settings' = 'main';
 
   constructor() {
     super({});
@@ -28,7 +34,30 @@ export class App extends Component {
   }
 
   protected render(): HTMLElement {
-    const root = this.createElement('div', { className: 'container' });
+    const root = this.createElement('div', { className: 'app-root' });
+    const state = store.getState();
+    this.currentView = state.currentView;
+
+    if (state.currentView === 'main') {
+      this.renderMainView(root, state);
+    } else {
+      this.renderSettingsView(root, state);
+    }
+
+    // Footer
+    this.footer = new Footer({
+      showSettingsLink: state.currentView === 'main',
+      onSettingsClick: () => {
+        store.setCurrentView('settings');
+      },
+    });
+    this.footer.mount(root);
+
+    return root;
+  }
+
+  private renderMainView(root: HTMLElement, state: ReturnType<typeof store.getState>): void {
+    this.mainContainer = this.createElement('div', { className: 'container' });
 
     // Domain input
     this.domainInput = new DomainInput({
@@ -40,24 +69,13 @@ export class App extends Component {
         this.loadFavicon(value);
       },
     });
-    this.domainInput.mount(root);
+    this.domainInput.mount(this.mainContainer);
 
-    // Actions row (size selector + button)
+    // Actions row (button only now, size is in settings)
     const actionsRow = this.createElement('div', { className: 'actions-row' });
 
-    const state = store.getState();
-    
-    this.sizeSelector = new SizeSelector({
-      selectedSize: state.selectedSize,
-      onSizeChange: (size) => {
-        store.setSelectedSize(size);
-        this.sendMessage({ type: 'save-size', size });
-      },
-    });
-    this.sizeSelector.mount(actionsRow);
-
     this.loadButton = new Button({
-      text: 'Load Favicon',
+      text: 'Load favicon',
       disabled: state.isLoading,
       onClick: () => {
         this.loadFavicon(this.domainInput.getValue());
@@ -65,7 +83,7 @@ export class App extends Component {
     });
     this.loadButton.mount(actionsRow);
 
-    root.appendChild(actionsRow);
+    this.mainContainer.appendChild(actionsRow);
 
     // Message component
     this.messageComponent = new Message({
@@ -73,7 +91,7 @@ export class App extends Component {
       type: state.message?.type,
       visible: !!state.message,
     });
-    this.messageComponent.mount(root);
+    this.messageComponent.mount(this.mainContainer);
 
     // History list
     this.historyList = new HistoryList({
@@ -86,9 +104,20 @@ export class App extends Component {
         this.sendMessage({ type: 'delete-domain', domain });
       },
     });
-    this.historyList.mount(root);
+    this.historyList.mount(this.mainContainer);
 
-    return root;
+    root.appendChild(this.mainContainer);
+  }
+
+  private renderSettingsView(root: HTMLElement, state: ReturnType<typeof store.getState>): void {
+    this.settingsPage = new SettingsPage({
+      settings: store.getSettings(),
+      onSave: (settings: Settings) => {
+        this.saveSettings(settings);
+        store.setCurrentView('main');
+      },
+    });
+    this.settingsPage.mount(root);
   }
 
   protected onMount(): void {
@@ -105,25 +134,37 @@ export class App extends Component {
   }
 
   private handleStateChange(state: ReturnType<typeof store.getState>): void {
-    // Update components based on state changes
-    this.sizeSelector.update({ selectedSize: state.selectedSize });
+    // Check if view changed - need full rerender
+    if (state.currentView !== this.currentView) {
+      this.rerender();
+      return;
+    }
 
-    this.loadButton.update({
-      text: state.isLoading ? 'Loading...' : 'Load Favicon',
-      disabled: state.isLoading,
-    });
+    // Update components based on state changes (main view only)
+    if (state.currentView === 'main') {
+      this.loadButton?.update({
+        text: state.isLoading ? 'Loading...' : 'Load favicon',
+        disabled: state.isLoading,
+      });
 
-    this.messageComponent.update({
-      text: state.message?.text,
-      type: state.message?.type,
-      visible: !!state.message,
-    });
+      this.messageComponent?.update({
+        text: state.message?.text,
+        type: state.message?.type,
+        visible: !!state.message,
+      });
 
-    this.historyList.update({
-      history: state.history,
-      searchTerm: state.searchTerm,
-      onItemClick: (domain) => this.loadFavicon(domain),
-      onItemDelete: (domain) => this.sendMessage({ type: 'delete-domain', domain }),
+      this.historyList?.update({
+        history: state.history,
+        searchTerm: state.searchTerm,
+        onItemClick: (domain) => this.loadFavicon(domain),
+        onItemDelete: (domain) => this.sendMessage({ type: 'delete-domain', domain }),
+      });
+    }
+
+    // Update footer
+    this.footer?.update({
+      showSettingsLink: state.currentView === 'main',
+      onSettingsClick: () => store.setCurrentView('settings'),
     });
   }
 
@@ -143,7 +184,14 @@ export class App extends Component {
       type: 'load-favicon',
       domain: trimmedDomain,
       size: state.selectedSize,
+      replaceAllFills: state.replaceAllFills,
+      addBlackOverlay: state.addBlackOverlay,
     });
+  }
+
+  private saveSettings(settings: Settings): void {
+    store.setSettings(settings);
+    this.sendMessage({ type: 'save-settings', settings });
   }
 
   private setupMessageListener(): void {
@@ -164,15 +212,15 @@ export class App extends Component {
       case 'history-loaded':
         this.handleHistoryLoaded(msg as HistoryLoadedMessage);
         break;
-      case 'size-loaded':
-        this.handleSizeLoaded(msg as SizeLoadedMessage);
+      case 'settings-loaded':
+        this.handleSettingsLoaded(msg as SettingsLoadedMessage);
         break;
     }
   }
 
   private handleFaviconLoaded(_msg: FaviconLoadedMessage): void {
     store.setLoading(false);
-    this.domainInput.clear();
+    this.domainInput?.clear();
     store.setSearchTerm('');
   }
 
@@ -185,8 +233,8 @@ export class App extends Component {
     store.setHistory(msg.history);
   }
 
-  private handleSizeLoaded(msg: SizeLoadedMessage): void {
-    store.setSelectedSize(msg.size as '32' | '120');
+  private handleSettingsLoaded(msg: SettingsLoadedMessage): void {
+    store.setSettings(msg.settings);
   }
 
   private sendMessage(msg: PluginMessage): void {
@@ -195,5 +243,6 @@ export class App extends Component {
 
   private requestInitialData(): void {
     this.sendMessage({ type: 'get-history' });
+    this.sendMessage({ type: 'get-settings' });
   }
 }

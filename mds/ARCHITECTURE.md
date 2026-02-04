@@ -9,7 +9,7 @@ The UI has been refactored from a monolithic `ui.html` file into a modular compo
 ```
 src/ui/
 ├── index.ts              # Entry point - initializes the app
-├── App.ts                # Main app component - orchestrates UI and Figma messaging
+├── App.ts                # Main app component - orchestrates UI, routing, and Figma messaging
 ├── types.ts              # Shared TypeScript types and interfaces
 ├── styles.css            # Global CSS styles
 ├── state/
@@ -21,7 +21,11 @@ src/ui/
     ├── SizeSelector.ts   # Size toggle (32/120)
     ├── Message.ts        # Error/success message display
     ├── HistoryList.ts    # History container component
-    └── HistoryItem.ts    # Individual history item
+    ├── HistoryItem.ts    # Individual history item
+    ├── Switcher.ts       # Toggle switch component for boolean settings
+    ├── SettingsItem.ts   # Individual settings row (title, description, control)
+    ├── SettingsPage.ts   # Settings page with all configurable options
+    └── Footer.ts         # Footer with settings link and version
 ```
 
 ## Key Concepts
@@ -51,9 +55,22 @@ export class Button extends Component<ButtonProps> {
 
 The `Store` class provides centralized state management using a pub/sub pattern:
 
-- **State**: `selectedSize`, `isLoading`, `history`, `searchTerm`, `message`
+- **State**: `currentView`, `selectedSize`, `replaceAllFills`, `addBlackOverlay`, `isLoading`, `history`, `searchTerm`, `message`
 - **Methods**: `getState()`, `setState()`, `subscribe()`
-- **Convenience methods**: `setSelectedSize()`, `setLoading()`, `setHistory()`, etc.
+- **Convenience methods**: `setSelectedSize()`, `setLoading()`, `setHistory()`, `setCurrentView()`, `setSettings()`, `getSettings()`, etc.
+
+### View Navigation
+
+The app supports multiple views controlled by `currentView` state:
+- `'main'` - Main view with domain input and history
+- `'settings'` - Settings page with configurable options
+
+### Settings
+
+Settings are persisted in Figma's client storage and include:
+- `selectedSize` - Favicon size ('32' or '120')
+- `replaceAllFills` - Whether to replace all existing fills (default: false)
+- `addBlackOverlay` - Whether to add 5% black overlay on top (default: false)
 
 Components subscribe to state changes and update automatically:
 
@@ -140,6 +157,40 @@ export class MyComponent extends Component<MyComponentProps> {
   }
 }
 ```
+
+## Component Reference
+
+### Switcher
+Toggle switch for boolean settings.
+
+Props:
+- `checked: boolean` - Current state
+- `onChange: (checked: boolean) => void` - Change handler
+- `disabled?: boolean` - Optional disabled state
+
+### SettingsItem
+A settings row with title, description, and control area.
+
+Props:
+- `title: string` - Setting name
+- `description: string` - Help text
+
+Methods:
+- `getControlContainer()` - Returns the container element for mounting child controls
+
+### SettingsPage
+The settings view with all configurable options.
+
+Props:
+- `settings: Settings` - Current settings values
+- `onSave: (settings: Settings) => void` - Save handler
+
+### Footer
+Footer component with optional settings link.
+
+Props:
+- `showSettingsLink: boolean` - Show/hide the settings link
+- `onSettingsClick: () => void` - Handler when settings link clicked
 
 ## Benefits
 
