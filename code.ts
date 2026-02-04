@@ -2,7 +2,7 @@
 figma.showUI(__html__, { width: 320, height: 500 });
 
 // Maximum number of domains in history
-const MAX_HISTORY_SIZE = 30;
+const MAX_HISTORY_SIZE = 100;
 const HISTORY_KEY = "domainHistory";
 const SETTINGS_KEY = "pluginSettings";
 
