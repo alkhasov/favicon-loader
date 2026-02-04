@@ -9,7 +9,7 @@ A Figma plugin that loads favicons from any domain and applies them to selected 
 - Load favicons from any domain as image fills
 - Configurable size (32px or 120px)
 - Optional: Replace all fills or add black overlay
-- Domain history (up to 30 items)
+- Domain history (up to 100 items)
 - Uses Yandex Favicon API
 
 ## Installation
