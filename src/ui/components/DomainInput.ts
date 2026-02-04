@@ -21,6 +21,7 @@ export class DomainInput extends Component<DomainInputProps> {
       placeholder: this.props.placeholder || 'example.com',
       value: this.props.value || '',
       autocomplete: 'off',
+      autofocus: true,
       onInput: (e: Event) => {
         const target = e.target as HTMLInputElement;
         if (this.props.onInput) {
@@ -57,5 +58,15 @@ export class DomainInput extends Component<DomainInputProps> {
 
   public clear(): void {
     this.setValue('');
+  }
+
+  public focus(): void {
+    this.inputElement?.focus();
+  }
+
+  protected onMount(): void {
+    // Auto-focus the input when component mounts
+    // Use setTimeout to ensure DOM is fully ready (needed for Figma plugin iframe)
+    setTimeout(() => this.focus(), 50);
   }
 }

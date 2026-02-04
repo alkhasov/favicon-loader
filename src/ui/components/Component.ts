@@ -115,7 +115,7 @@ export abstract class Component<P extends ComponentProps = ComponentProps> {
       } else if (key.startsWith('on') && typeof value === 'function') {
         const eventName = key.substring(2).toLowerCase();
         element.addEventListener(eventName, value);
-      } else if (key === 'disabled' || key === 'checked' || key === 'selected') {
+      } else if (key === 'disabled' || key === 'checked' || key === 'selected' || key === 'autofocus') {
         // Boolean attributes - set or remove based on value
         if (value) {
           element.setAttribute(key, '');

@@ -131,7 +131,7 @@ input[type="text"]::placeholder {
 }
 
 .history-list {
-  max-height: 324px;
+  max-height: 326px;
   overflow-y: auto;
   border-radius: 8px;
   background: #f0f0f0;
@@ -359,7 +359,7 @@ input[type="text"]::placeholder {
         } else if (key.startsWith("on") && typeof value === "function") {
           const eventName = key.substring(2).toLowerCase();
           element.addEventListener(eventName, value);
-        } else if (key === "disabled" || key === "checked" || key === "selected") {
+        } else if (key === "disabled" || key === "checked" || key === "selected" || key === "autofocus") {
           if (value) {
             element.setAttribute(key, "");
           } else {
@@ -400,6 +400,7 @@ input[type="text"]::placeholder {
         placeholder: this.props.placeholder || "example.com",
         value: this.props.value || "",
         autocomplete: "off",
+        autofocus: true,
         onInput: (e) => {
           const target = e.target;
           if (this.props.onInput) {
@@ -431,6 +432,13 @@ input[type="text"]::placeholder {
     }
     clear() {
       this.setValue("");
+    }
+    focus() {
+      var _a;
+      (_a = this.inputElement) == null ? void 0 : _a.focus();
+    }
+    onMount() {
+      setTimeout(() => this.focus(), 50);
     }
   };
 
